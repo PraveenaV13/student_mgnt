@@ -1,10 +1,6 @@
 pipeline {
 	agent any
 
-	environment {
-		RAILS_ENV = "test"
-	}
-
 	stages {
 		stage('Checkout') {
 			steps {
@@ -12,27 +8,19 @@ pipeline {
 			}
 		}
 
-		stage('Install Gems') {
+		stage('Start Containers') {
 			steps {
-				sh 'bundle install'
-			}
-		}
-
-		stage('Create Database') {
-			steps {
-				sh 'bundle exec rails db:create'
-			}
-		}
-
-		stage('Run Migrations') {
-			steps {
-				sh 'bundle exec rails db:migrate'
+				sh 'docker compose up -d --build'
 			}
 		}
 
 		stage('Run Tests') {
 			steps {
-				sh 'bundle exec rails test'
+				sh '''
+                    docker compose exec -T app bundle exec rails db:create RAILS_ENV=test
+                    docker compose exec -T app bundle exec rails db:migrate RAILS_ENV=test
+                    docker compose exec -T app bundle exec rails test
+                '''
 			}
 		}
 	}

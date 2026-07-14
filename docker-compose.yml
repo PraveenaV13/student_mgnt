@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: student_test
+
+  app:
+    build: .
+    depends_on:
+      - db
+    environment:
+      DATABASE_HOST: db
