@@ -8,18 +8,24 @@ pipeline {
 			}
 		}
 
-		stage('Start Containers') {
+		stage('Build Image') {
 			steps {
-				sh 'docker compose up -d --build'
+				sh 'docker compose build'
+			}
+		}
+
+		stage('Start Database') {
+			steps {
+				sh 'docker compose up -d db'
 			}
 		}
 
 		stage('Run Tests') {
 			steps {
 				sh '''
-                    docker compose exec -T app bundle exec rails db:create RAILS_ENV=test
-                    docker compose exec -T app bundle exec rails db:migrate RAILS_ENV=test
-                    docker compose exec -T app bundle exec rails test
+                    docker compose run --rm app bundle exec rails db:create RAILS_ENV=test
+                    docker compose run --rm app bundle exec rails db:migrate RAILS_ENV=test
+                    docker compose run --rm app bundle exec rails test
                 '''
 			}
 		}

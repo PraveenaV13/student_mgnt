@@ -12,3 +12,6 @@ services:
       - db
     environment:
       DATABASE_HOST: db
+    volumes:
+      - .:/app
+    working_dir: /app
